@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
 dict1 = {
     'буря': '10',
     'мглою': '10',
