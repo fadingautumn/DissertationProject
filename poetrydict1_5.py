@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[4]:
-
-
 from Worddict import dict1
 
 import collections
@@ -77,10 +71,3 @@ for line in lines:
     dict2.append(line_str(line))
 
 poetcount(dict2)
-
-
-# In[ ]:
-
-
-
-
