@@ -1,38 +1,11 @@
-from Worddict import dict1
-
-import collections
-
-def line_str (x):
-    sol = ''
-    line_accents = ''
-    bad_chars = [';', ':', '!', '*', '.', ',']
-    x = ''.join(i for i in x if not i in bad_chars)
-    x = x.lower()
-    words = x.split()
-    for word in words:
-        if word in dict1:
-            line_accents += dict1[word]
-        else:
-            print('Слово отсутствует в словаре:', word)
-    sol = line_accents
-
-    if sol in dictmeter:
-        return dictmeter[sol]
-    else:
-        print('Я пока не умею определять такой размер')
-
-def poetcount (ln):
-    poetic_list = []
-    poetic_list.append(line_str(line))
-    c = collections.Counter()
-    for meter in poetic_list:
-        c[meter] += 1
-    return c.most_common(1)
-
-txt = '''Буря мглою небо кроет
-Вихри снежные крутя.
-То как зверь она завоет,
-То заплачет как дитя'''
+text = """Буря мглою небо кроет,
+Вихри снежные крутя;
+То, как зверь, она завоет,
+То заплачет, как дитя,
+То по кровле обветшалой
+Вдруг соломой зашумит,
+То, как путник запоздалый,
+К нам в окошко застучит."""
 
 dictmeter = {
     '010101': 'Трёхстопный ямб',
@@ -65,9 +38,52 @@ dictmeter = {
     
 }
 
-dict2 = []
-lines = txt.split('\n')
-for line in lines:
-    dict2.append(line_str(line))
+dict1 = {
+    'буря': '10',
+    'мглою': '10',
+    'небо': '10',
+    'кроет': '10',
+    'вихри': '10',
+    'снежные': '100',
+    'крутя': '01',
+    'то': '1',
+    'как': '1',
+    'зверь': '1',
+    'она': '01',
+    'завоет': '010',
+    'заплачет': '010',
+    'дитя': '01',
+    'по': '1',
+    'кровле': '10',
+    'обветшалой': '0010',
+    'вдруг': '1',
+    'соломой': '010',
+    'зашумит': '001',
+    'путник': '10',
+    'запоздалый': '0010',
+    'к нам в': '1',
+    'окошко': '010',
+    'застучит': '001'
+}
 
-poetcount(dict2)
+import re
+import collections
+import nltk
+from nltk import word_tokenize
+
+def line_count(x):
+    lines = x.split('\n')
+    all_step = []
+    line_acc = ''
+    for line in lines:
+        cleantext = line.lower() 
+        cleantext = re.sub('[^а-яА-Я]', ' ', cleantext)
+        words = nltk.word_tokenize(cleantext)
+        for word in words:
+            if word in dict1:
+                line_acc += dict1[word]
+            if line_acc in dictmeter:
+                all_step.append(dictmeter[line_acc])
+        return all_step
+
+line_count(text)
