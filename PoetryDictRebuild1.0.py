@@ -38,52 +38,74 @@ dictmeter = {
     
 }
 
-dict1 = {
-    'буря': '10',
-    'мглою': '10',
-    'небо': '10',
-    'кроет': '10',
-    'вихри': '10',
-    'снежные': '100',
-    'крутя': '01',
-    'то': '1',
-    'как': '1',
-    'зверь': '1',
-    'она': '01',
-    'завоет': '010',
-    'заплачет': '010',
-    'дитя': '01',
-    'по': '1',
-    'кровле': '10',
-    'обветшалой': '0010',
-    'вдруг': '1',
-    'соломой': '010',
-    'зашумит': '001',
-    'путник': '10',
-    'запоздалый': '0010',
-    'к нам в': '1',
-    'окошко': '010',
-    'застучит': '001'
-}
-
-import re
-import collections
 import nltk
+import pymorphy2
+import re
+import difflib
+from wiktionaryparser import WiktionaryParser
 from nltk import word_tokenize
+parser = WiktionaryParser()
+parser.set_default_language('russian')
+morph = pymorphy2.MorphAnalyzer()
 
-def line_count(x):
-    lines = x.split('\n')
-    all_step = []
-    line_acc = ''
+def get_accent(unaccword):
+    word = parser.fetch(unaccword)
+    first_mean = word[0]
+    definitive = first_mean.get('definitions')
+    if len(definitive) > 0:
+        for element in definitive:
+            sign1 = element.get('text')
+            sign1 = sign1[0]
+            sign1 = sign1.split(' ')
+            sign1 = sign1[0]
+            return sign1
+    elif len(definitive) == 0:
+        parse = morph.parse(unaccword)[0]
+        morphword = parse.normal_form
+        word = parser.fetch(morphword)
+        first_mean = word[0]
+        definitive = first_mean.get('definitions')
+        for element in definitive:
+            sign1 = element.get('text')
+            sign1 = sign1[0]
+            sign1 = sign1.split(' ')
+            sign1 = sign1[0]
+            return sign1
+    else:
+        return "Что-то пошло не так"
+    
+def get_numbers (stressword):
+    accent_word = get_accent(stressword)
+    unaccent = ['а', 'е', 'и', 'о', 'у', 'ы', 'э', 'ю', 'я']
+    substr = ''
+    try:
+        for i in accent_word:
+            if i in unaccent:
+                substr += '0'
+            elif i == '́' or i == 'ё':
+                substr += '1'
+            else:
+                continue
+    except:
+        print ('Что-то пошло не так')
+        pass
+    if len(substr) == 1:
+        substr = '1'
+    true_sub = substr.replace('01', '1')
+    return true_sub
+
+def get_verse_size(rawpoem):
+    lines = text.split('\n')
+    supersize = []
     for line in lines:
         cleantext = line.lower() 
-        cleantext = re.sub('[^а-яА-Я]', ' ', cleantext)
+        cleantext = re.sub('[^а-я]', ' ', cleantext)
         words = nltk.word_tokenize(cleantext)
+        razmer = ''
         for word in words:
-            if word in dict1:
-                line_acc += dict1[word]
-            if line_acc in dictmeter:
-                all_step.append(dictmeter[line_acc])
-        return all_step
+            razmer += get_numbers(word)
+        supersize.append(razmer)
+    return supersize
 
-line_count(text)
+x = get_verse_size(text)
+print(x)
