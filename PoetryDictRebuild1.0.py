@@ -42,6 +42,8 @@ import nltk
 import pymorphy2
 import re
 import difflib
+import collections
+from collections import Counter
 from wiktionaryparser import WiktionaryParser
 from nltk import word_tokenize
 parser = WiktionaryParser()
@@ -107,5 +109,21 @@ def get_verse_size(rawpoem):
         supersize.append(razmer)
     return supersize
 
-x = get_verse_size(text)
-print(x)
+def best_verse_size(num_lines):
+  line_size_list = []
+  for i in get_verse_size(num_lines):
+    temp = 0
+    best_fit_size = ''
+    for key in dictmeter:
+      output = int(difflib.SequenceMatcher(None, i, key).ratio()*100)
+      if temp < output and temp < 100:
+        temp = output
+        best_fit_size = dictmeter[key]
+    line_size_list.append(best_fit_size)
+  counter = Counter(line_size_list)
+  max_count = counter.most_common(2)
+  max_count1 = f'{max_count[0][0]} встречается в {max_count[0][1]} строках стихотворения, а значит, он наиболее вероятен. '
+  max_count2 = f'Также программа выделила {max_count[1][0]}, который встречается в {max_count[1][1]} строках стихотворения.'
+  return max_count1 + max_count2
+
+best_verse_size(text)
